@@ -89,6 +89,7 @@ interface MoneySource {
   corporation: number;
   crime: number;
   gang: number;
+  gang_expenses: number;
   hacking: number;
   hacknet: number;
   hacknet_expenses: number;
@@ -344,7 +345,9 @@ interface CrimeStats {
  */
 interface BasicHGWOptions {
   /** Number of threads to use for this function.
-   * Must be less than or equal to the number of threads the script is running with. */
+   * Must be less than or equal to the number of threads the script is running with.
+   * Accepts positive non integer values.
+   */
   threads?: number;
   /** Set to true this action will affect the stock market. */
   stock?: boolean;
@@ -3256,7 +3259,7 @@ export interface Bladeburner {
    *
    * This function returns the number of skill points needed to upgrade the specified skill the specified number of times.
    *
-   * The function returns -1 if an invalid skill name is passed in.
+   * The function returns -1 if an invalid skill name is passed in, and Infinity if the count overflows the maximum level.
    *
    * @param skillName - Name of skill. Case-sensitive and must be an exact match.
    * @param count - Number of times to upgrade the skill. Defaults to 1 if not specified.
@@ -6051,10 +6054,10 @@ export interface NS {
    * @example
    * ```js
    * //The following example will execute the script ‘foo.js’ with 10 threads, in 500 milliseconds and the arguments ‘foodnstuff’ and 90:
-   * ns.spawn('foo.js', 10, 500, 'foodnstuff', 90);
+   * ns.spawn('foo.js', {threads: 10, spawnDelay: 500}, 'foodnstuff', 90);
    * ```
    * @param script - Filename of script to execute.
-   * @param threadOrOptions - Either an integer number of threads for new script, or a {@link SpawnOptions} object. Threads defaults to 1.
+   * @param threadOrOptions - Either an integer number of threads for new script, or a {@link SpawnOptions} object. Threads defaults to 1 and spawnDelay defaults to 10,000 ms.
    * @param args - Additional arguments to pass into the new script that is being run.
    */
   spawn(script: string, threadOrOptions?: number | SpawnOptions, ...args: (string | number | boolean)[]): void;
@@ -6643,6 +6646,17 @@ export interface NS {
    * @returns True if the data is successfully written to the port, and false otherwise.
    */
   tryWritePort(portNumber: number, data: string | number): boolean;
+
+  /**
+   * Listen for a port write.
+   * @remarks
+   * RAM cost: 0 GB
+   *
+   * Sleeps until the port is written to.
+   *
+   * @param port - Port to listen for a write on. Must be a positive integer.
+   */
+  nextPortWrite(port: number): Promise<void>;
 
   /**
    * Read content of a file.
