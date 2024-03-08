@@ -64,6 +64,7 @@
 |  [GangGenInfo](./bitburner.ganggeninfo.md) | Gang general info. |
 |  [GangMemberAscension](./bitburner.gangmemberascension.md) |  |
 |  [GangMemberInfo](./bitburner.gangmemberinfo.md) |  |
+|  [GangMemberInstall](./bitburner.gangmemberinstall.md) |  |
 |  [GangOtherInfo](./bitburner.gangotherinfo.md) |  |
 |  [GangOtherInfoObject](./bitburner.gangotherinfoobject.md) |  |
 |  [GangTaskStats](./bitburner.gangtaskstats.md) | Object representing data representing a gang member task. |
@@ -159,7 +160,6 @@
 |  [GoOpponent](./bitburner.goopponent.md) |  |
 |  [NSEnums](./bitburner.nsenums.md) |  |
 |  [PlayerRequirement](./bitburner.playerrequirement.md) | Structured interface to requirements for joining a faction or company. For fields with numerical value &gt; 0, the player must have at least this value. For fields with numerical value &lt;<!-- -->= 0, the player must have at most this value. For "not", the sub-condition must be failed instead of passed. For "someCondition", at least one sub-condition must be passed. |
-|  [PortData](./bitburner.portdata.md) |  |
 |  [ReactNode](./bitburner.reactnode.md) | <p>A stand-in for the real React.ReactNode. A [ReactElement](./bitburner.reactelement.md) is rendered dynamically with React. number and string are displayed directly. boolean, null, and undefined are ignored and not rendered. An array of ReactNodes will display all members of that array sequentially.</p><p>Use React.createElement to make the ReactElement type, see [creating an element without jsx](https://react.dev/reference/react/createElement#creating-an-element-without-jsx) from the official React documentation.</p> |
 |  [ScriptArg](./bitburner.scriptarg.md) |  |
 |  [SleeveBladeburnerTask](./bitburner.sleevebladeburnertask.md) |  |

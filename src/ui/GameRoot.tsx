@@ -71,7 +71,7 @@ import { V2Modal } from "../utils/V2Modal";
 import { MathJaxContext } from "better-react-mathjax";
 import { useRerender } from "./React/hooks";
 import { HistoryProvider } from "./React/Documentation";
-import { GoRoot } from "../Go/GoRoot";
+import { GoRoot } from "../Go/ui/GoRoot";
 
 const htmlLocation = location;
 
@@ -246,7 +246,7 @@ export function GameRoot(): React.ReactElement {
       mainPage = (
         <ScriptEditorRoot
           files={pageWithContext.files ?? new Map()}
-          hostname={Player.getCurrentServer().hostname}
+          hostname={pageWithContext.options?.hostname ?? Player.getCurrentServer().hostname}
           vim={!!pageWithContext.options?.vim}
         />
       );

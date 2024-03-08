@@ -25,9 +25,6 @@ interface Skills {
 type CodingContractData = any;
 
 /** @public */
-type PortData = string | number;
-
-/** @public */
 type ScriptArg = string | number | boolean;
 
 /** @public */
@@ -51,6 +48,7 @@ interface Player extends Person {
   factions: string[];
   totalPlaytime: number;
   location: string;
+  karma: number;
 }
 
 /** @public */
@@ -965,6 +963,22 @@ interface GangMemberInfo {
 }
 
 /** @public */
+interface GangMemberInstall {
+  /** Factor by which the hacking ascension multiplier was decreased (newMult / oldMult) */
+  hack: number;
+  /** Factor by which the strength ascension multiplier was decreased (newMult / oldMult) */
+  str: number;
+  /** Factor by which the defense ascension multiplier was decreased (newMult / oldMult) */
+  def: number;
+  /** Factor by which the dexterity ascension multiplier was decreased (newMult / oldMult) */
+  dex: number;
+  /** Factor by which the agility ascension multiplier was decreased (newMult / oldMult) */
+  agi: number;
+  /** Factor by which the charisma ascension multiplier was decreased (newMult / oldMult) */
+  cha: number;
+}
+
+/** @public */
 interface GangMemberAscension {
   /** Amount of respect lost from ascending */
   respect: number;
@@ -1054,20 +1068,23 @@ export interface NetscriptPort {
    * @remarks
    * RAM cost: 0 GB
    *
-   * @returns The data popped off the queue if it was full. */
-  write(value: string | number): PortData | null;
+   * @param value - Data to write, it's cloned with structuredClone().
+   * @returns The data popped off the queue if it was full.
+   */
+  write(value: any): any;
 
   /**
    * Attempt to write data to the port.
    * @remarks
    * RAM cost: 0 GB
    *
+   * @param value - Data to write, it's cloned with structuredClone().
    * @returns True if the data was added to the port, false if the port was full
    */
-  tryWrite(value: string | number): boolean;
+  tryWrite(value: any): boolean;
 
   /**
-   * Sleeps until the port is written to.
+   * Waits until the port is written to.
    * @remarks
    * RAM cost: 0 GB
    */
@@ -1082,7 +1099,7 @@ export interface NetscriptPort {
    * If the port is empty, then the string “NULL PORT DATA” will be returned.
    * @returns the data read.
    */
-  read(): PortData;
+  read(): any;
 
   /**
    * Retrieve the first element from the port without removing it.
@@ -1094,7 +1111,7 @@ export interface NetscriptPort {
    * the port is empty, the string “NULL PORT DATA” will be returned.
    * @returns the data read
    */
-  peek(): PortData;
+  peek(): any;
 
   /**
    * Check if the port is full.
@@ -3561,8 +3578,9 @@ export interface CodingContract {
    * Generate a dummy contract on the home computer with no reward. Used to test various algorithms.
    *
    * @param type - Type of contract to generate
+   * @returns Filename of the contract.
    */
-  createDummyContract(type: string): void;
+  createDummyContract(type: string): string;
 
   /**
    * List all contract types.
@@ -3831,6 +3849,18 @@ export interface Gang {
    * @returns Object with info about the ascension results, or undefined if ascension is not possible.
    */
   getAscensionResult(memberName: string): GangMemberAscension | undefined;
+
+  /**
+   * Get the effect of an install on ascension multipliers without installing.
+   * @remarks
+   * RAM cost: 2 GB
+   *
+   * Get {@link GangMemberInstall} effects on ascension multipliers for a gang member after installing without performing the install.
+   *
+   * @param memberName - Name of member.
+   * @returns Object with info about the install results on ascension multipliers, or undefined if ascension is not possible.
+   */
+  getInstallResult(memberName: string): GangMemberInstall | undefined;
 
   /**
    * Enable/Disable territory clashes.
@@ -5484,6 +5514,15 @@ export interface NS {
    */
   growthAnalyzeSecurity(threads: number, hostname?: string, cores?: number): number;
 
+  readonly heart: {
+    /**
+     * Get your current karma.
+     * @remarks
+     * RAM cost: 0 GB
+     */
+    break(): number;
+  };
+
   /**
    * Suspends the script for n milliseconds.
    * @remarks
@@ -6054,10 +6093,10 @@ export interface NS {
    * @example
    * ```js
    * //The following example will execute the script ‘foo.js’ with 10 threads, in 500 milliseconds and the arguments ‘foodnstuff’ and 90:
-   * ns.spawn('foo.js', 10, 500, 'foodnstuff', 90);
+   * ns.spawn('foo.js', {threads: 10, spawnDelay: 500}, 'foodnstuff', 90);
    * ```
    * @param script - Filename of script to execute.
-   * @param threadOrOptions - Either an integer number of threads for new script, or a {@link SpawnOptions} object. Threads defaults to 1.
+   * @param threadOrOptions - Either an integer number of threads for new script, or a {@link SpawnOptions} object. Threads defaults to 1 and spawnDelay defaults to 10,000 ms.
    * @param args - Additional arguments to pass into the new script that is being run.
    */
   spawn(script: string, threadOrOptions?: number | SpawnOptions, ...args: (string | number | boolean)[]): void;
@@ -6642,10 +6681,10 @@ export interface NS {
    * Otherwise, the data will be written normally.
    *
    * @param portNumber - Port to attempt to write to. Must be a positive integer.
-   * @param data - Data to write.
+   * @param data - Data to write, it's cloned with structuredClone().
    * @returns True if the data is successfully written to the port, and false otherwise.
    */
-  tryWritePort(portNumber: number, data: string | number): boolean;
+  tryWritePort(portNumber: number, data: any): boolean;
 
   /**
    * Listen for a port write.
@@ -6685,7 +6724,7 @@ export interface NS {
    * @param portNumber - Port to peek. Must be a positive integer.
    * @returns Data in the specified port.
    */
-  peek(portNumber: number): PortData;
+  peek(portNumber: number): any;
 
   /**
    * Clear data from a file.
@@ -6716,10 +6755,10 @@ export interface NS {
    *
    * Write data to the given Netscript port.
    * @param portNumber - Port to write to. Must be a positive integer.
-   * @param data - Data to write.
+   * @param data - Data to write, it's cloned with structuredClone().
    * @returns The data popped off the queue if it was full, or null if it was not full.
    */
-  writePort(portNumber: number, data: string | number): PortData | null;
+  writePort(portNumber: number, data: any): any;
   /**
    * Read data from a port.
    * @remarks
@@ -6731,7 +6770,7 @@ export interface NS {
    * @param portNumber - Port to read from. Must be a positive integer.
    * @returns The data read.
    */
-  readPort(portNumber: number): PortData;
+  readPort(portNumber: number): any;
 
   /**
    * Get all data on a port.
@@ -7207,7 +7246,7 @@ export interface NS {
    *
    * Add callback to be executed when the script dies.
    */
-  atExit(f: () => void): void;
+  atExit(f: () => void, id?: string): void;
 
   /**
    * Move a file on the target server.
